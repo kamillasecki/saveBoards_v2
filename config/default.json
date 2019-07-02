@@ -1,0 +1,4 @@
+{
+  "mongoURI": "mongodb+srv://sb123:mango123@cluster0-4xknw.mongodb.net/test?retryWrites=true&w=majority",
+  "jwtSecret": "sfjr44^dafd34;/."
+}
