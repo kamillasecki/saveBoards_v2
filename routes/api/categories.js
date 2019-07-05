@@ -67,7 +67,7 @@ router.post(
       parent.categoriesId.push(mongoose.Types.ObjectId(n.id));
       await parent.save();
 
-      res.json({ msg: 'Category has been created successfully' });
+      return res.json({ msg: 'Category has been created successfully' });
     } catch (err) {
       console.error(err.message);
       res.status(500).send('Server error');
@@ -112,33 +112,91 @@ router.get(
       return res.status(400).json({ errors: errors.array() });
     }
 
-    var categoryId = req.params.category_id;
+    const categoryId = req.params.category_id;
     parentCategories = [];
 
     // Checking categoryID format
     if (!mongoose.Types.ObjectId.isValid(categoryId)) {
-      return res.status(400).json({ msg: 'Invalid format of category id' });
+      return res.status(400).json({ msg: 'Invalid category id' });
     }
+    try {
+      // Getting category
+      const category = await Category.findOne({ _id: categoryId }).populate(
+        'categoriesId'
+      );
 
-    // Getting category
-    const category = await Category.findOne({ _id: categoryId }).populate(
-      'categoriesId'
-    );
+      if (!category) {
+        return res.status(400).json({ msg: 'Invalid category id' });
+      }
+
+      // Check if requested category is main one
+      if (category.parent == null) {
+        parentCategories.push(category);
+        return res.send(parentCategories);
+      }
+
+      // Call recurrent function to get all the parents for the category
+      parentCategories.push(category);
+      getParentQuery(category, res);
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Server error');
+    }
+  }
+);
+
+// @route   DELETE api/catrgories/:category_id
+// @desc    Delete Category by Id
+// @access  Admin
+
+router.delete('/:category_id', auth, async (req, res) => {
+  const categoryId = req.params.category_id;
+
+  // Checking categoryID format
+  if (!mongoose.Types.ObjectId.isValid(categoryId)) {
+    return res.status(400).json({ msg: 'Invalid category id' });
+  }
+
+  try {
+    const category = await Category.findOne({ _id: categoryId });
+
+    if (req.user.role != 'admin') {
+      return res
+        .status(401)
+        .json({ msg: 'You have no permision to perform this action' });
+    }
 
     if (!category) {
       return res.status(400).json({ msg: 'Invalid category id' });
     }
 
-    // Check if requested category is main one
-    if (category.parent == null) {
-      parentCategories.push(category);
-      return res.send(parentCategories);
+    if (category.postsId.length != 0) {
+      return res.status(400).json({
+        msg:
+          'It is not possible to remove this category. There are posts under this category'
+      });
     }
 
-    // Call recurrent function to get all the parents for the category
-    parentCategories.push(category);
-    getParentQuery(category, res);
+    if (category.categoriesId.length != 0) {
+      return res.status(400).json({
+        msg:
+          'It is not possible to remove this category. There are other categories attached to it'
+      });
+    }
+
+    await Category.update(
+      { _id: category.parent },
+      { $pull: { categoriesId: categoryId } },
+      { multi: true }
+    );
+
+    await Category.findOneAndDelete({ _id: categoryId });
+
+    return res.json({ msg: 'Category has been deleted' });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
   }
-);
+});
 
 module.exports = router;
