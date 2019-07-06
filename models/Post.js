@@ -4,33 +4,105 @@ const Schema = mongoose.Schema;
 const PostSchema = new Schema(
   {
     settings: {
-      privacy: String,
-      author: { type: Schema.Types.ObjectId, ref: 'users' },
-      category: { type: Schema.Types.ObjectId, ref: 'categories' },
-      encryption: { isEnabled: Boolean, checkword: String },
-      isAdmin: Boolean,
-      isRequested: Boolean,
-      isAllowed: Boolean,
+      privacy: {
+        type: String
+      },
+      author: {
+        type: Schema.Types.ObjectId,
+        ref: 'users'
+      },
+      authorName: {
+        type: String
+      },
+      avatar: {
+        type: String
+      },
+      category: {
+        type: Schema.Types.ObjectId,
+        ref: 'categories'
+      },
+      encryption: {
+        isEnabled: Boolean,
+        checkword: String
+      },
+      isAdmin: {
+        type: Boolean
+      },
+      isRequested: {
+        type: Boolean
+      },
+      isAllowed: { type: Boolean },
       access: {
-        admin: [{ type: Schema.Types.ObjectId, ref: 'users' }],
-        allowed: [{ type: Schema.Types.ObjectId, ref: 'users' }],
-        requested: [{ type: Schema.Types.ObjectId, ref: 'users' }],
-        invited: [{ type: Schema.Types.ObjectId, ref: 'users' }]
+        admin: [
+          {
+            type: Schema.Types.ObjectId,
+            ref: 'users'
+          }
+        ],
+        allowed: [
+          {
+            type: Schema.Types.ObjectId,
+            ref: 'users'
+          }
+        ],
+        requested: [
+          {
+            type: Schema.Types.ObjectId,
+            ref: 'users'
+          }
+        ],
+        invited: [
+          {
+            type: Schema.Types.ObjectId,
+            ref: 'users'
+          }
+        ]
       }
     },
     header: {
-      subject: String,
+      subject: {
+        type: String,
+        required: true
+      },
       votes: {
-        num: Number,
-        upVotes: [String],
-        downVotes: [String]
+        num: {
+          type: Number
+        },
+        upVotes: [
+          {
+            user: {
+              type: Schema.Types.ObjectId,
+              ref: 'users'
+            }
+          }
+        ],
+        downVotes: [
+          {
+            user: {
+              type: Schema.Types.ObjectId,
+              ref: 'users'
+            }
+          }
+        ]
       }
     },
     body: {
-      text: String,
-      updates: [String]
+      text: {
+        type: String,
+        required: true
+      },
+      updates: [
+        {
+          type: String
+        }
+      ]
     },
-    replies: [{ type: Schema.Types.ObjectId, ref: 'replies' }],
+    replies: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'replies'
+      }
+    ],
     createdAt: { type: Date, default: Date.now }
   },
   {
@@ -42,3 +114,5 @@ const PostSchema = new Schema(
     }
   }
 );
+
+module.exports = Post = mongoose.model('post', PostSchema);
