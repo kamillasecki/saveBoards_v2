@@ -26,4 +26,4 @@ const CategorySchema = new mongoose.Schema({
 });
 
 // create the model for users and expose it to our app
-module.exports = CATEGORY = mongoose.model('Category', CategorySchema);
+module.exports = Category = mongoose.model('Category', CategorySchema);

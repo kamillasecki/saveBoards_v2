@@ -5,21 +5,16 @@ const PostSchema = new Schema(
   {
     settings: {
       privacy: {
-        type: String
+        type: String,
+        enum: ['pub', 'cgh', 'cgp']
       },
       author: {
         type: Schema.Types.ObjectId,
-        ref: 'users'
-      },
-      authorName: {
-        type: String
-      },
-      avatar: {
-        type: String
+        ref: 'User'
       },
       category: {
         type: Schema.Types.ObjectId,
-        ref: 'categories'
+        ref: 'Category'
       },
       encryption: {
         isEnabled: Boolean,
@@ -36,25 +31,25 @@ const PostSchema = new Schema(
         admin: [
           {
             type: Schema.Types.ObjectId,
-            ref: 'users'
+            ref: 'User'
           }
         ],
         allowed: [
           {
             type: Schema.Types.ObjectId,
-            ref: 'users'
+            ref: 'User'
           }
         ],
         requested: [
           {
             type: Schema.Types.ObjectId,
-            ref: 'users'
+            ref: 'User'
           }
         ],
         invited: [
           {
             type: Schema.Types.ObjectId,
-            ref: 'users'
+            ref: 'User'
           }
         ]
       }
@@ -66,13 +61,14 @@ const PostSchema = new Schema(
       },
       votes: {
         num: {
-          type: Number
+          type: Number,
+          default: 0
         },
         upVotes: [
           {
             user: {
               type: Schema.Types.ObjectId,
-              ref: 'users'
+              ref: 'User'
             }
           }
         ],
@@ -80,7 +76,7 @@ const PostSchema = new Schema(
           {
             user: {
               type: Schema.Types.ObjectId,
-              ref: 'users'
+              ref: 'User'
             }
           }
         ]
@@ -100,7 +96,7 @@ const PostSchema = new Schema(
     replies: [
       {
         type: Schema.Types.ObjectId,
-        ref: 'replies'
+        ref: 'Reply'
       }
     ],
     createdAt: { type: Date, default: Date.now }
@@ -115,4 +111,4 @@ const PostSchema = new Schema(
   }
 );
 
-module.exports = Post = mongoose.model('post', PostSchema);
+module.exports = Post = mongoose.model('Post', PostSchema);

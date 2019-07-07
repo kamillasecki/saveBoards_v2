@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const Category = require('../../models/Category');
-const User = require('../../models/User');
 const mongoose = require('mongoose');
 const { check, validationResult } = require('express-validator');
 const auth = require('../../middleware/auth');
+
+require('../../models/User');
 
 let parentCategories;
 
@@ -64,7 +65,7 @@ router.post(
       });
 
       await n.save();
-      parent.categoriesId.push(mongoose.Types.ObjectId(n.id));
+      parent.categoriesId.push(n.id);
       await parent.save();
 
       return res.json({ msg: 'Category has been created successfully' });
